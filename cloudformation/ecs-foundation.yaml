@@ -14,6 +14,15 @@ Parameters:
     Type: String
     Default: 10.20.2.0/24
 
+  AllowedHttpCidr:
+    Type: String
+    Default: 0.0.0.0/0
+    Description: CIDR range allowed to access the migrated service
+
+  EcsExecutionRoleArn:
+    Type: String
+    Description: ARN of the ECS task execution role
+
 Resources:
   MigrationVPC:
     Type: AWS::EC2::VPC
@@ -97,7 +106,7 @@ Resources:
         - IpProtocol: tcp
           FromPort: 80
           ToPort: 80
-          CidrIp: 0.0.0.0/0
+          CidrIp: !Ref AllowedHttpCidr
       Tags:
         - Key: Name
           Value: ecs-migration-sg
@@ -106,6 +115,14 @@ Resources:
     Type: AWS::ECS::Cluster
     Properties:
       ClusterName: hybrid-migration-cluster
+      ClusterSettings:
+        - Name: containerInsights
+          Value: enabled
+      Tags:
+        - Key: Name
+          Value: hybrid-migration-cluster
+        - Key: Project
+          Value: hybrid-container-migration
 
   MigrationTaskDefinition:
     Type: AWS::ECS::TaskDefinition
@@ -116,14 +133,17 @@ Resources:
       NetworkMode: awsvpc
       RequiresCompatibilities:
         - FARGATE
-      ExecutionRoleArn: arn:aws:iam::123456789012:role/ecsTaskExecutionRole
+      ExecutionRoleArn: !Ref EcsExecutionRoleArn
       ContainerDefinitions:
         - Name: migration-app
-          Image: nginx:latest
+          Image: nginx:1.27
           Essential: true
           PortMappings:
             - ContainerPort: 80
               Protocol: tcp
+      Tags:
+        - Key: Project
+          Value: hybrid-container-migration
 
   MigrationService:
     Type: AWS::ECS::Service
@@ -133,6 +153,7 @@ Resources:
       TaskDefinition: !Ref MigrationTaskDefinition
       DesiredCount: 1
       LaunchType: FARGATE
+      EnableECSManagedTags: true
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: ENABLED
