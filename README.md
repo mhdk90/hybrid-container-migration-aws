@@ -8,26 +8,36 @@ Design a migration-ready AWS foundation for containerized workloads, with hybrid
 
 ## Current Scope
 - VPC
+- Public subnets
 - ECS Cluster
 - ECS Task Definition
 - ECS Service
 
 ## Planned Hybrid Components
-- Site-to-Site VPN or Direct Connect for hybrid connectivity
-- RDS PostgreSQL for managed database migration
-- Storage Gateway for hybrid storage integration
-- Architecture diagram showing on-prem to AWS connectivity flow
+- Site-to-Site VPN or Direct Connect
+- RDS PostgreSQL
+- Storage Gateway
+- Architecture and migration documentation
 
 ## Repository Structure
-- `cloudformation/` – infrastructure templates
-- `docs/` – notes and architecture explanations
+- `cloudformation/` – CloudFormation templates
+- `docs/` – architecture and migration notes
+
+## Deployment Notes
+This repo currently focuses on the AWS-side landing zone for migrated containers. Hybrid network details are documented separately.
 
 ## Security Notes
 - No secrets are stored in this repository
 - Environment-specific values should be passed as parameters
 - Real enterprise network details are intentionally omitted
 
+## Roadmap
+- Add working ECS foundation template
+- Add architecture diagram
+- Add migration strategy
+- Add CI workflow
+
 ## What I Learned
 - How to prepare AWS as a migration target for containerized workloads
-- How to structure a hybrid migration project in YAML
-- How to document migration architecture clearly for GitHub and CV use
+- How to structure a hybrid migration repo for GitHub
+- How to document migration design clearly for recruiters
